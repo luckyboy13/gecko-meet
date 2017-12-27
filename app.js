@@ -9,7 +9,7 @@ var Meeting = require('./models/meeting');
 var compression = require('compression');
 var helmet = require('helmet');
 
-mongoose.connect('mongodb://ergofoxy:zara6471@ds159676.mlab.com:59676/meetup-planner')
+mongoose.connect('mongodb://gecko16:gecko16rulez@ds157158.mlab.com:57158/meeting-planner-mvp')
 var db = mongoose.connection;
 //Check connection
 db.once('open', function(){
