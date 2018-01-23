@@ -1,70 +1,69 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
-var Meeting = require('./models/meeting');
-var compression = require('compression');
-var helmet = require('helmet');
+const express = require("express");
+const mongoose = require("mongoose");
+const passport = require("passport");
+const cookieSession = require("cookie-session");
+const bodyParser = require("body-parser");
+const expressValidator = require("express-validator");
+const flash = require("connect-flash");
+const authRoutes = require("./routes/auth-routes");
+const meetingRoutes = require("./routes/meeting-routes");
+const profileRoutes = require("./routes/profile-routes");
+const connectRoutes = require("./routes/connect-routes");
+const commentRoutes = require("./routes/comment-routes");
 
-mongoose.connect('mongodb://gecko16:gecko16rulez@ds157158.mlab.com:57158/meeting-planner-mvp')
-var db = mongoose.connection;
-//Check connection
-db.once('open', function(){
-  console.log('Connected to mongoDB');
-});
-//Check for db errors
-db.on('error', function(err) {
-  console.log(err);
-});
-//Init app
-var app = express();
+const app = express();
 
-var index = require('./routes/index');
-var list = require('./routes/list');
-var create = require('./routes/create');
+// load environment variables
+if (process.env.NODE_ENV !== "production") require("dotenv").config();
+const PORT = process.env.PORT;
+const dbURI = process.env.MONGODB_URI;
+const sessionSecret = process.env.SESSION;
+const passportSetup = require("./config/passport-setup");
 
+// set up view engine
+app.set("view engine", "ejs");
 
+app.use(cookieSession({
+  maxAge: 24 * 60 * 60 * 1000, // 1 day
+  keys: [sessionSecret]
+}))
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+//initialize passport
+app.use(passport.initialize());
+app.use(passport.session());
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(compression()); //Compress all routes
-app.use(helmet());
-app.use(express.static(path.join(__dirname, 'public')));
+// Use bluebird to avoid warning:
+// "Mongoose: mpromise (mongoose's default promise library) is deprecated"
+mongoose.Promise = require('bluebird');
 
-//Home route
-
-app.use('/', index);
-app.use('/list', list);
-app.use('/create', create);
-
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+// connect to mongodb using `mongoose.connect`...
+var promise = mongoose.connect(dbURI, {
+  useMongoClient: true,
+  /* other options */
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+// use middleware
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(expressValidator()); // Add this after the bodyParser middleware
+app.use(flash());
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+// set up routes
+app.use("/auth", authRoutes);
+app.use("/meetings", meetingRoutes);
+app.use("/profile", profileRoutes);
+app.use("/connect", connectRoutes);
+app.use("/comment", commentRoutes);
+
+// create home route
+app.get("/", (req, res) => {
+  res.render("index", {title: "GeckoMeet - Homepage", user: req.user});
 });
 
-module.exports = app;
+// start the server
+app.listen(PORT, (err) => {
+  if (err) {
+    throw err;
+  }
+  console.log(`Listening on Port ${PORT}`);
+});
