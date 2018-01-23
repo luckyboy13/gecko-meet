@@ -1,25 +1,43 @@
 {
-  "name": "gecko-meet",
-  "version": "0.0.0",
-  "private": true,
+  "name": "gregarious-gecko",
+  "version": "1.0.0",
+  "description": "A meeting planner",
+  "main": "app.js",
   "scripts": {
-    "start": "node ./bin/www",
-    "devstart": "nodemon ./bin/www"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "author": "geckos-16",
+  "license": "ISC",
+  "engines": {
+    "node": "8.9.2",
+    "npm": "5.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chingu-voyage3/geckos-16.git"
+  },
+  "homepage": "https://github.com/chingu-voyage3/geckos-16#readme",
   "dependencies": {
     "async": "^2.6.0",
+    "bcryptjs": "^2.4.3",
+    "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
-    "compression": "^1.7.1",
-    "cookie-parser": "~1.4.3",
-    "debug": "~2.6.9",
+    "connect-flash": "^0.1.1",
+    "cookie-session": "^2.0.0-beta.3",
     "ejs": "^2.5.7",
-    "express": "~4.15.5",
-    "helmet": "^3.9.0",
-    "mongoose": "^4.13.7",
-    "morgan": "~1.9.0",
-    "serve-favicon": "~2.4.5"
+    "express": "^4.16.2",
+    "express-validator": "^4.3.0",
+    "moment": "^2.20.1",
+    "mongoose": "^4.13.9",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "passport-google-oauth": "^1.0.0",
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {
-    "nodemon": "^1.14.3"
+    "dotenv": "latest",
+    "nodemon": "latest"
   }
 }
